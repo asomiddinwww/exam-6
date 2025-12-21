@@ -119,7 +119,7 @@ const Header = () => {
                   : "border-1 border-amber-50 hover:border-[black] rounded-[10px] transition-all"
               }
             >
-              <a class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
+              <div class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
                 <span class="text-xl">
                   <svg
                     stroke="currentColor"
@@ -134,7 +134,7 @@ const Header = () => {
                   </svg>
                 </span>
                 <span className="text-[17px]">Studentlar</span>
-              </a>
+              </div>
             </NavLink>
             <NavLink
               to={"/guruhlar"}
@@ -144,7 +144,7 @@ const Header = () => {
                   : "border-1 border-amber-50 hover:border-[black] rounded-[10px] transition-all"
               }
             >
-              <a class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
+              <div class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
                 <span class="text-xl">
                   <svg
                     stroke="currentColor"
@@ -159,7 +159,7 @@ const Header = () => {
                   </svg>
                 </span>
                 <span className="text-[17px]">Guruhlar</span>
-              </a>
+              </div>
             </NavLink>
             <NavLink
               to={"/kurslar"}
@@ -169,7 +169,7 @@ const Header = () => {
                   : "border-1 border-amber-50 hover:border-[black] rounded-[10px] transition-all"
               }
             >
-              <a class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
+              <div class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
                 <span class="text-xl">
                   <svg
                     stroke="currentColor"
@@ -190,7 +190,7 @@ const Header = () => {
                   </svg>
                 </span>
                 <span className="text-[17px]">Kurslar</span>
-              </a>
+              </div>
             </NavLink>
             <NavLink
               to={"/payment"}
@@ -200,7 +200,7 @@ const Header = () => {
                   : "border-1 border-amber-50 hover:border-[black] rounded-[10px] transition-all"
               }
             >
-              <a class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
+              <div class="flex items-center w-53.5 gap-3 p-2 pb-[6px] pt-[6px] rounded-lg transition-all border border-transparent cursor-pointer hover:!border-foreground/70 ">
                 <span class="text-xl">
                   <svg
                     stroke="currentColor"
@@ -215,7 +215,7 @@ const Header = () => {
                   </svg>
                 </span>
                 <span className="text-[17px]">Payment</span>
-              </a>
+              </div>
             </NavLink>
           </ul>
         </div>

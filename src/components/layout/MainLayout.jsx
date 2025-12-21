@@ -1,12 +1,18 @@
-import React from "react";
-import Header from "../Header";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const MainLayout = () => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("isAuth");
+    navigate("/login");
+  };
+
   return (
-    <div className="flex">
-      <Header />
-      <Outlet />
+    <div>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 };
