@@ -1,22 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 AOS.init();
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
+    setLoading(true);
     const ok = await login(email, password);
-    if (ok) navigate("/");
-    else setError("Email yoki parol noto‘g‘ri");
+    setLoading(false);
+
+    if (ok) {
+      toast.success("Muvaffaqiyatli tizimga kirdingiz");
+      navigate("/");
+    } else {
+      toast.error("Email yoki parol noto‘g‘ri");
+    }
   };
 
   return (
@@ -34,9 +42,12 @@ export default function Login() {
 
         <label>Email</label>
         <input
+          type="email"
           className="w-full p-3 mb-4 rounded bg-[#1b1b1b] border border-gray-700"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email kiriting"
+          disabled={loading}
         />
 
         <label>Parol</label>
@@ -45,15 +56,20 @@ export default function Login() {
           className="w-full p-3 mb-4 rounded bg-[#1b1b1b] border border-gray-700"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="Parol kiriting"
+          disabled={loading}
         />
-
-        {error && <p className="text-red-500 mb-3">{error}</p>}
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-white text-black py-3 rounded-lg font-semibold"
+          disabled={loading || !email || !password}
+          className={`w-full py-3 rounded-lg font-semibold ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-white text-black hover:bg-gray-200"
+          }`}
         >
-          Kirish
+          {loading ? "Yuklanmoqda..." : "Kirish"}
         </button>
       </div>
     </div>

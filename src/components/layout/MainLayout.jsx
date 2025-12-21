@@ -1,3 +1,4 @@
+import { Header } from "antd/es/layout/layout";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const MainLayout = () => {
@@ -9,10 +10,9 @@ const MainLayout = () => {
   };
 
   return (
-    <div>
-      <main>
-        <Outlet />
-      </main>
+    <div className="flex w-full">
+      <Header />
+      <Outlet />
     </div>
   );
 };

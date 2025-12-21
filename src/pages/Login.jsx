@@ -1,80 +1,82 @@
-  import React, { useState } from "react";
-  import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-  const Login = () => {
-    const navigate = useNavigate();
+const Login = () => {
+  const { login } = useAuth(); // ✅ CONTEXT LOGIN
+  const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-      if (email === "usern88@mail.ru" && password === "12345678") {
-        const token = btoa(
-          JSON.stringify({
-            email,
-            time: Date.now(),
-          })
-        );
+    const success = await login(email, password); // ✅ BACKEND LOGIN
 
-        localStorage.setItem("authToken", token);
+    if (success) {
+      navigate("/asosiy", { replace: true }); // yoki /admins
+    } else {
+      setError("Email yoki parol noto‘g‘ri!");
+    }
 
-        navigate("/", { replace: true });
-      } else {
-        setError("Email yoki parol noto‘g‘ri!");
-      }
-    };
+    setIsLoading(false);
+  };
 
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
-        <form
-          onSubmit={handleSubmit}
-          className="w-[420px] bg-[#181616] p-8 rounded-2xl shadow-xl"
-        >
-          <h2 className="text-2xl font-semibold text-white text-center mb-6">
-            Admin Login
-          </h2>
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-[430px] bg-[#181616] rounded-2xl shadow-xl p-8">
+        <h2 className="text-2xl font-semibold text-white text-center mb-2">
+          Xush kelibsiz 👋
+        </h2>
+        <p className="text-sm text-center text-white mb-6">
+          Hisobingizga kirish uchun email va parolni kiriting
+        </p>
 
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm text-white mb-1">Email</label>
+            <label className="block text-sm mb-1 text-white">Email</label>
             <input
               type="email"
-              placeholder="usern88@mail.ru"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-[#2B323F] text-white outline-none"
+              className="w-full px-4 py-2 rounded-lg border text-white border-gray-300 bg-[#2B323F]"
               required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm text-white mb-1">Parol</label>
+            <label className="block text-sm mb-1 text-white">Parol</label>
             <input
               type="password"
-              placeholder="12345678"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-[#2B323F] text-white outline-none"
+              className="w-full px-4 py-2 rounded-lg border text-white border-gray-300 bg-[#2B323F]"
               required
             />
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm text-center mb-3">{error}</p>
+            <p className="text-sm text-red-500 mb-3 text-center">
+              {error}
+            </p>
           )}
 
           <button
             type="submit"
-            className="w-full py-2 bg-white text-black rounded-lg font-medium hover:opacity-90"
+            disabled={isLoading}
+            className="w-full py-2 bg-white text-black rounded-lg hover:opacity-90 disabled:opacity-50"
           >
-            Kirish
+            {isLoading ? "Yuklanmoqda..." : "Kirish"}
           </button>
         </form>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default Login;
+export default Login;

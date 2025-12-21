@@ -1,29 +1,28 @@
+// src/pages/AdminsPage.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/axios"; // 🔥 Axios instance ishlatamiz
 import { useAuth } from "../context/AuthContext";
 
 export default function AdminsPage() {
-  const { token } = useAuth();
+  const { token } = useAuth(); // auth contextdan token
   const [admins, setAdmins] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      console.warn("TOKEN YO‘Q");
+      setLoading(false);
+      return;
+    }
 
     const fetchAdmins = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/api/admins`, // backend endpoint
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get("https://admin-crm.onrender.com/api/staff/all-admins"); // interceptor tokenni qo‘shadi
+        console.log("FETCH ADMINS:", res.data);
 
-        // Agar backend bitta object qaytarsa, uni arrayga o'girib qo'yamiz
+        // backenddan kelgan malumotni state ga saqlash
         if (Array.isArray(res.data.data)) {
           setAdmins(res.data.data);
         } else if (res.data.data) {
@@ -32,7 +31,7 @@ export default function AdminsPage() {
           setAdmins([]);
         }
       } catch (err) {
-        console.error("Fetch admins error:", err);
+        console.error("FETCH ADMINS ERROR:", err.response?.data || err.message);
         setAdmins([]);
       } finally {
         setLoading(false);
@@ -42,11 +41,12 @@ export default function AdminsPage() {
     fetchAdmins();
   }, [token]);
 
+  // Filter funksiyasi
   const filteredAdmins = admins.filter((admin) => {
     const matchesSearch =
-      admin.first_name.toLowerCase().includes(search.toLowerCase()) ||
-      admin.last_name.toLowerCase().includes(search.toLowerCase()) ||
-      admin.email.toLowerCase().includes(search.toLowerCase());
+      admin.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+      admin.last_name?.toLowerCase().includes(search.toLowerCase()) ||
+      admin.email?.toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus =
       statusFilter === "All"
@@ -62,6 +62,7 @@ export default function AdminsPage() {
     <div className="p-6 text-white min-h-screen bg-black">
       <h1 className="text-2xl font-bold mb-4">Adminlar ro'yxati</h1>
 
+      {/* Search & Filter */}
       <div className="flex items-center mb-4 gap-4">
         <input
           type="text"
@@ -82,6 +83,7 @@ export default function AdminsPage() {
         </select>
       </div>
 
+      {/* Table */}
       <table className="min-w-full border border-gray-700">
         <thead>
           <tr className="bg-gray-800">
@@ -96,13 +98,13 @@ export default function AdminsPage() {
           {filteredAdmins.length === 0 ? (
             <tr>
               <td colSpan="5" className="p-3 text-center text-gray-400">
-                Hech qanday admin topilmadi
+                Admin topilmadi
               </td>
             </tr>
           ) : (
             filteredAdmins.map((admin) => (
               <tr
-                key={admin._id}
+                key={admin._id || admin.id}
                 className="border-t border-gray-700 hover:bg-gray-900"
               >
                 <td className="p-3">{admin.first_name}</td>

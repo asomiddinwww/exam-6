@@ -12,14 +12,24 @@ import Payment from "./pages/Payment";
 import Sozlamalar from "./pages/Sozlamalar";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminsPage from "./dashboard/AdminsPage";
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />}>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Asosiy />} />
         <Route path="/menagerlar" element={<Menagerlar />} />
         <Route path="/adminlar" element={<Adminlar />} />
+        <Route path="/admins" element={<AdminsPage />} />
         <Route path="/ustozlar" element={<Ustozlar />} />
         <Route path="/studentlar" element={<Studentlar />} />
         <Route path="/guruhlar" element={<Guruhlar />} />
