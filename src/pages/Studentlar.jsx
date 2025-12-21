@@ -1,63 +1,70 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
-import { DownOutlined, SearchOutlined } from "@ant-design/icons";
-import { Dropdown, Space } from "antd";
+import axios from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 const Studentlar = () => {
-  const items = [
-    {
-      label: (
-        <a target="_blank" rel="noopener noreferrer">
-          All
-        </a>
-      ),
-      key: "1",
-    },
-    {
-      label: (
-        <a target="_blank" rel="noopener noreferrer">
-          Tatilda
-        </a>
-      ),
-      key: "0",
-    },
-    {
-      label: (
-        <a target="_blank" rel="noopener noreferrer">
-          Faol
-        </a>
-      ),
-      key: "1",
-    },
-    {
-      label: (
-        <a target="_blank" rel="noopener noreferrer">
-          Yakunladi
-        </a>
-      ),
-      key: "1",
-    },
-  ];
-  const [open, setOpen] = useState(() => {
-    return JSON.parse(localStorage.getItem("menuOpen")) || false;
-  });
+  const [showSearch, setShowSearch] = useState(false);
+
+  const { token } = useAuth();
+  const [admins, setAdmins] = useState([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(
+    JSON.parse(localStorage.getItem("menuOpen")) || false
+  );
 
   useEffect(() => {
     localStorage.setItem("menuOpen", JSON.stringify(open));
   }, [open]);
+
+  useEffect(() => {
+    if (!token) {
+      console.warn("TOKEN YO‘Q");
+      setLoading(false);
+      return;
+    }
+
+    const fetchAdmins = async () => {
+      try {
+        const res = await axios.get(
+          "https://admin-crm.onrender.com/api/student/get-all-students"
+        );
+        setAdmins(res.data?.data || []);
+      } catch (err) {
+        console.error("FETCH ADMINS ERROR:", err.response?.data || err.message);
+        setAdmins([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdmins();
+  }, [token]);
+
+  const filteredAdmins = admins.filter((admin) => {
+    const matchesSearch =
+      admin.first_name?.toLowerCase().includes(search.toLowerCase()) ||
+      admin.last_name?.toLowerCase().includes(search.toLowerCase()) ||
+      admin.email?.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "All"
+        ? true
+        : (admin.status || "").toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <div className="w-full flex font1">
-      <div
-        className={`
-    transition-all duration-300 ease-in-out
-    ${open ? "w-77 opacity-100 translate-x-0" : "w-0 opacity-0 -translate-x-5"}
-    overflow-hidden
-  `}
-      >
+    <div className="flex w-full min-h-screen bg-white text-black">
+      <div className={open ? "block" : "hidden"}>
         <Header />
       </div>
-      <div className="w-full font1">
+
+      <div className="flex-1">
         <div className="p-[12px] border-[#9e9d9d] flex justify-between  border-b-1 w-full pl-3">
           <div class="flex items-center gap-4">
             <button
@@ -108,7 +115,7 @@ const Studentlar = () => {
                     <path d="m9 18 6-6-6-6"></path>
                   </svg>
                   <Link to={"/"} class="max-[500px]:text-sm text-[17px]">
-                    Students
+                    Teachers
                   </Link>
                 </div>
               </div>
@@ -181,60 +188,136 @@ const Studentlar = () => {
             </div>
           </div>
         </div>
-        <div className="p-4 pt-5">
-          <div className="w-full flex items-center justify-between">
-            <h1 className="text-[21px] font-[600]">Studenlar ro'yxati</h1>
-            <div className="flex items-center gap-4">
-              <button className="pl-2 pr-2 pt-[1.5px] pb-[1.8px] rounded-[8px] text-[19px] bg-black text-white">
-                <SearchOutlined />
-              </button>
-              <button className=" pl-2.5 pr-2.5 pt-0.5 flex items-center bg-black text-white gap-2 rounded-[8px]">
-                <span className="text-[20px]">+</span> Student Qo'shish
-              </button>
-              <div className="border p-[3px] pl-3 pr-3 rounded-[8px] border-[#eae3e3]">
-                <Dropdown menu={{ items }} trigger={["click"]}>
-                  <a onClick={(e) => e.preventDefault()}>
-                    <Space>
-                      All
-                      <DownOutlined className="text-[13px] !text-[#9e9d9d]" />
-                    </Space>
-                  </a>
-                </Dropdown>
-              </div>
-            </div>
+        <div className="w-full flex items-center justify-between pl-4 pr-4">
+          <h1 className="font1 text-[19px] font-[600]">Ustozlar ro'yxati</h1>
+          <div className="p-4 flex items-center gap-3">
+            {/* Search button */}
+            <button
+              onClick={() => setShowSearch((prev) => !prev)}
+              className="w-10 h-9 flex items-center justify-center rounded-lg bg-black text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </svg>
+            </button>
+
+            {showSearch && (
+              <input
+                type="text"
+                placeholder="Qidirish..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+                className="h-9 w-64 px-4 rounded-lg border border-[#e8e7e6] text-sm outline-none"
+              />
+            )}
+
+            <button className="h-9 px-3 flex items-center gap-2 rounded-lg bg-black text-white text-sm font-medium">
+              <span className="text-lg leading-none">+</span>
+              Ustoz Qo‘shish
+            </button>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-9 px-2 rounded-lg border border-[#e8e7e6] bg-white text-sm outline-none"
+            >
+              <option value="All">All</option>
+              <option value="faol">Faol</option>
+              <option value="tatilda">Tatilda</option>
+              <option value="nofaol">Nofaol</option>
+            </select>
           </div>
-          <div></div>
         </div>
+
         <div className="pt-4 p-4 text-[15px] font1">
-          <table className="w-full">
-            <thead>
-              <tr className="flex items-center justify-between border-b pr-25 pb-3 border-[#e8e7e6] pl-4">
-                <td className="flex gap-35">
-                  <td>Ism</td>
-                  <td>Familya</td>
-                </td>
-                <td> Telefon raqam</td>
-                <td className="flex gap-30 pl-27">
-                  <td> Guruhlar soni </td>
-                  <td>Holat</td>
-                </td>
-                <td> Adminlar</td>
-              </tr>
-              <tr className="flex items-center justify-between border-b pr-5 pb-3 pt-3 border-[#e8e7e6] pl-4">
-                <td className="flex gap-5">
-                  <td></td>
-                  <td></td>
-                </td>
-                <td> </td>
-                <td className="flex gap-11">
-                  <td> </td>
-                  <td></td>
-                </td>
-                <td> </td>
-                <td></td>
-              </tr>
-            </thead>
-          </table>
+          <div className="bg-white rounded-xl border-b border-[#e8e7e6] overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="border-b border-[#e8e7e6]">
+                <tr className="text-[14px] text-gray-500">
+                  <th className="px-6 py-4">Ism</th>
+                  <th className="px-6 py-4">Familiya</th>
+                  <th className="px-6 py-4"> Telefon raqam</th>
+                  <th className="px-6 py-4">Guruhlar soni</th>
+                  <th className="px-6 py-4">Holat</th>
+                  <th className="px-6 py-4 text-right">Amallar</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {loading ? (
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <tr key={i} className="border-b border-[#e8e7e6] ">
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-32 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-40 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-56 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 w-24 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-5 w-24 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                      <td className="px-6 py-4 flex justify-end">
+                        <div className="h-4 w-6 rounded-full bg-gray-100 animate-pulse" />
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredAdmins.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="py-6 text-center text-gray-400">
+                      Hech qanday admin topilmadi
+                    </td>
+                  </tr>
+                ) : (
+                  filteredAdmins.map((admin) => (
+                    <tr
+                      key={admin._id || admin.id}
+                      className="border-b border-[#e8e7e6] last:border-b-0 hover:bg-gray-50 transition"
+                    >
+                      <td className="px-6 py-4">{admin.first_name}</td>
+                      <td className="px-6 py-4">{admin.last_name}</td>
+                      <td className="px-6 py-4 text-gray-600">{admin.phone}</td>
+                      <td className="px-6 py-4">
+                        {admin.groups?.map((g) => g.group?.name).join(", ")}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-[15px] font-medium
+              ${
+                admin.status === "faol"
+                  ? ""
+                  : admin.status === "tatilda"
+                  ? ""
+                  : ""
+              }`}
+                        >
+                          {admin.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">...</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
