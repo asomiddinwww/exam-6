@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const { login } = useAuth(); // ✅ CONTEXT LOGIN
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -16,10 +16,10 @@ const Login = () => {
     setError("");
     setIsLoading(true);
 
-    const success = await login(email, password); // ✅ BACKEND LOGIN
+    const success = await login(email, password); 
 
     if (success) {
-      navigate("/asosiy", { replace: true }); // yoki /admins
+      navigate("/", { replace: true });
     } else {
       setError("Email yoki parol noto‘g‘ri!");
     }
