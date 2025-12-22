@@ -236,7 +236,7 @@ const Adminlar = () => {
               <option value="All">All</option>
               <option value="faol">Faol</option>
               <option value="tatilda">Tatilda</option>
-              <option value="nofaol">Nofaol</option>
+              <option value="ishdan bo'shatilgan">Nofaol</option>
             </select>
           </div>
         </div>
